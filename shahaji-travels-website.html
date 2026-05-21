@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shahaji Travels — Book Bus Tickets Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#C0392B;--red-dark:#96281B;--red-light:#FDECEA;--red-border:#F5C6C2;
+  --green:#27AE60;--green-light:#EAFAF1;--green-border:#A9DFBF;
+  --text:#1C1C1E;--text-mid:#3D3D3D;--text-sub:#8E8E93;
+  --border:#E5E5EA;--chip:#F2F2F7;--bg:#F8F9FA;--white:#FFFFFF;
+  --shadow:0 4px 24px rgba(192,57,43,0.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--red);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:60px;box-shadow:0 2px 16px rgba(0,0,0,0.18);}
+.nav-logo{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:1px;display:flex;align-items:center;gap:10px;}
+.nav-logo .bus-icon{font-size:1.3rem;}
+.nav-links{display:flex;gap:0.2rem;list-style:none;}
+.nav-links a{color:rgba(255,255,255,0.82);text-decoration:none;font-size:0.82rem;font-weight:600;padding:6px 12px;border-radius:8px;transition:all 0.18s;}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,0.18);color:#fff;}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
+.nav-hamburger span{display:block;width:24px;height:2.5px;background:#fff;border-radius:2px;transition:0.3s;}
+.hero{background:var(--red);padding:100px 5% 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-80px;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,0.06);}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-60px;width:300px;height:300px;border-radius:50%;background:rgba(0,0,0,0.08);}
+.hero-inner{max-width:680px;position:relative;z-index:1;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:20px;animation:fadeUp 0.5s ease both;}
+.hero-badge::before{content:'●';font-size:0.45rem;animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(2.4rem,5.5vw,4rem);font-weight:700;color:#fff;line-height:1.08;margin-bottom:16px;animation:fadeUp 0.5s 0.08s ease both;}
+.hero h1 span{color:#FFD700;}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:32px;font-weight:300;animation:fadeUp 0.5s 0.16s ease both;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp 0.5s 0.24s ease both;}
+.btn-primary{background:#fff;color:var(--red);text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:700;font-size:0.95rem;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);display:inline-flex;align-items:center;gap:8px;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.btn-secondary{background:rgba(255,255,255,0.15);color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:600;font-size:0.95rem;border:1.5px solid rgba(255,255,255,0.35);transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-secondary:hover{background:rgba(255,255,255,0.25);}
+.hero-stats{display:flex;gap:32px;margin-top:44px;flex-wrap:wrap;animation:fadeUp 0.5s 0.32s ease both;}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#FFD700;}
+.stat-label{font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.search-wrap{padding:0 5%;margin-top:-36px;position:relative;z-index:10;}
+.search-card{background:var(--white);border-radius:20px;padding:28px;box-shadow:0 8px 40px rgba(192,57,43,0.13);border:1px solid var(--border);}
+.search-card h3{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:20px;}
+.search-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+.field-label{font-size:0.7rem;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;}
+.input-wrap{position:relative;}
+.input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;}
+.search-input{width:100%;padding:12px 12px 12px 38px;border:1.5px solid var(--border);border-radius:12px;font-size:0.9rem;color:var(--text);background:var(--chip);transition:border-color 0.2s;font-family:'Noto Sans',sans-serif;}
+.search-input:focus{outline:none;border-color:var(--red);background:#fff;}
+.search-btn{background:var(--red);color:#fff;border:none;padding:13px 28px;border-radius:12px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;transition:all 0.2s;white-space:nowrap;}
+.search-btn:hover{background:var(--red-dark);transform:translateY(-1px);}
+section{padding:72px 5%;}
+.sec-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:clamp(1.7rem,3vw,2.5rem);font-weight:700;color:var(--text);line-height:1.15;margin-bottom:12px;}
+.sec-sub{font-size:0.95rem;color:var(--text-sub);line-height:1.7;max-width:520px;font-weight:300;}
+#features{background:#fff;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:40px;}
+.feature-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:24px;transition:all 0.22s;cursor:default;}
+.feature-card:hover{border-color:var(--red);box-shadow:0 8px 28px rgba(192,57,43,0.1);transform:translateY(-4px);}
+.feature-icon{font-size:2rem;margin-bottom:14px;}
+.feature-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px;}
+.feature-text{font-size:0.88rem;color:var(--text-sub);line-height:1.65;}
+#how{background:var(--bg);}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:40px;}
+.step-card{background:#fff;border-radius:16px;padding:28px 20px;text-align:center;border:1px solid var(--border);}
+.step-num{width:48px;height:48px;border-radius:50%;background:var(--red);color:#fff;font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.step-icon{font-size:1.8rem;margin-bottom:12px;}
+.step-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px;}
+.step-text{font-size:0.85rem;color:var(--text-sub);line-height:1.6;}
+#routes{background:#fff;}
+.routes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:36px;}
+.route-card{background:var(--bg);border-radius:14px;padding:18px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);transition:all 0.2s;cursor:pointer;}
+.route-card:hover{border-color:var(--red);background:var(--red-light);box-shadow:0 4px 16px rgba(192,57,43,0.1);}
+.route-from{font-weight:700;font-size:0.95rem;color:var(--text);}
+.route-arrow{color:var(--red);font-size:1.4rem;font-weight:700;margin:3px 0;}
+.route-to{font-weight:700;font-size:0.95rem;color:var(--text);margin-top:3px;}
+.route-price-wrap{text-align:right;}
+.route-from-label{font-size:0.65rem;color:var(--text-sub);text-transform:uppercase;letter-spacing:0.08em;}
+.route-amount{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--red);}
+.route-per{font-size:0.68rem;color:var(--text-sub);}
+#bustypes{background:var(--bg);}
+.bustypes-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px;}
+.bustype-card{background:#fff;border-radius:18px;overflow:hidden;border:1px solid var(--border);}
+.bustype-head{background:var(--red);padding:20px;display:flex;align-items:center;gap:14px;}
+.bustype-head-icon{font-size:2rem;}
+.bustype-head-title{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;}
+.bustype-head-sub{font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:2px;}
+.bustype-body{padding:20px;}
+.bustype-feat{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--chip);font-size:0.88rem;color:var(--text-mid);}
+.bustype-feat:last-child{border-bottom:none;}
+.bustype-feat-icon{font-size:1rem;}
+.bustype-price{margin-top:16px;background:var(--green-light);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--green-border);}
+.bustype-price-text{font-size:0.78rem;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;}
+.bustype-price-val{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green);margin-top:2px;}
+#seats{background:#fff;}
+.seat-demo{background:var(--bg);border-radius:18px;padding:28px;border:1px solid var(--border);margin-top:36px;}
+.seat-demo-header{background:#2C3E50;border-radius:10px;padding:10px 16px;text-align:right;margin-bottom:16px;}
+.seat-demo-header span{color:#fff;font-size:0.8rem;font-weight:700;letter-spacing:1px;}
+.seat-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.seat-label{width:36px;font-size:0.72rem;color:var(--text-sub);font-weight:600;}
+.seat-gap{width:16px;}
+.seat{width:44px;height:50px;border-radius:10px;border:1.5px solid #D0D0D0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;font-size:11px;font-weight:700;color:var(--text);}
+.seat:hover{border-color:var(--red);transform:scale(1.07);}
+.seat.booked-m{background:#F39C12;border-color:transparent;color:#fff;}
+.seat.booked-f{background:#9B59B6;border-color:transparent;color:#fff;}
+.seat.selected{background:var(--green);border-color:transparent;color:#fff;}
+.seat.blocked{background:#E0E0E0;border-color:#9E9E9E;color:#9E9E9E;cursor:not-allowed;}
+.seat-emoji{font-size:14px;line-height:16px;}
+.seat-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-sub);}
+.legend-dot{width:14px;height:14px;border-radius:4px;}
+#payment{background:var(--bg);}
+.payment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:36px;}
+.payment-card{background:#fff;border-radius:16px;padding:22px;border:2px solid var(--border);transition:all 0.2s;}
+.payment-card.active{border-color:var(--red);background:var(--red-light);}
+.payment-icon-wrap{width:52px;height:36px;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;}
+.payment-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.payment-sub{font-size:0.82rem;color:var(--text-sub);}
+.payment-badge{display:inline-block;margin-top:10px;background:var(--green-light);border:1px solid var(--green-border);color:var(--green);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+#app{background:var(--red);padding:72px 5%;}
+.app-inner{display:flex;align-items:center;gap:60px;flex-wrap:wrap;}
+.app-content{flex:1;min-width:280px;}
+.app-content .sec-title{color:#fff;}
+.app-content .sec-sub{color:rgba(255,255,255,0.7);}
+.app-content .sec-label{color:rgba(255,255,255,0.7);}
+.app-badges{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;}
+.app-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;padding:12px 20px;text-decoration:none;color:#fff;transition:all 0.2s;}
+.app-badge:hover{background:rgba(255,255,255,0.22);}
+.app-badge-icon{font-size:1.8rem;}
+.app-badge-small{font-size:0.65rem;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em;}
+.app-badge-big{font-size:0.95rem;font-weight:700;margin-top:2px;}
+.app-phone{width:200px;height:370px;border-radius:32px;flex-shrink:0;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
+.app-phone-screen{font-size:3.5rem;}
+.app-phone-label{font-size:0.78rem;color:rgba(255,255,255,0.6);font-weight:600;text-align:center;padding:0 16px;line-height:1.5;}
+#contact{background:#fff;}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:36px;}
+.contact-card{background:var(--bg);border-radius:14px;padding:22px;text-align:center;border:1px solid var(--border);}
+.contact-icon{font-size:2rem;margin-bottom:12px;}
+.contact-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-sub);margin-bottom:6px;}
+.contact-value{font-weight:600;font-size:0.95rem;color:var(--text);}
+.contact-value a{color:var(--red);text-decoration:none;}
+.dev-section{background:var(--text);padding:40px 5%;text-align:center;}
+.dev-title{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:10px;}
+.dev-name{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:8px;}
+.dev-contacts{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
+.dev-contact{font-size:0.88rem;color:rgba(255,255,255,0.65);font-weight:500;}
+.legal-wrap{max-width:860px;margin:0 auto;padding:96px 5% 72px;}
+.legal-wrap h2{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--text);padding-bottom:14px;border-bottom:2.5px solid var(--red);margin-bottom:8px;}
+.legal-updated{font-size:0.8rem;color:var(--text-sub);margin-bottom:32px;}
+.legal-wrap h3{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);margin:28px 0 10px;}
+.legal-wrap p,.legal-wrap li{font-size:0.92rem;color:var(--text-mid);line-height:1.8;}
+.legal-wrap ul{padding-left:20px;margin-top:8px;}
+.legal-wrap li{margin-bottom:6px;}
+.legal-wrap a{color:var(--red);}
+.legal-back{display:inline-flex;align-items:center;gap:6px;color:var(--red);font-weight:700;text-decoration:none;margin-top:32px;font-size:0.9rem;}
+footer{background:var(--text);color:rgba(255,255,255,0.55);padding:32px 5%;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;}
+.footer-links{display:flex;gap:1rem;flex-wrap:wrap;}
+.footer-links a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.82rem;transition:color 0.2s;}
+.footer-links a:hover{color:#FFD700;}
+.footer-copy{width:100%;text-align:center;font-size:0.78rem;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);margin-top:8px;}
+@media(max-width:768px){
+  .search-grid{grid-template-columns:1fr 1fr;}
+  .search-btn{grid-column:1/-1;}
+  .bustypes-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;flex-direction:column;position:absolute;top:60px;left:0;right:0;background:var(--red);padding:12px;}
+  .nav-links.open{display:flex;}
+  .nav-hamburger{display:flex;}
+  .hero{padding:90px 5% 48px;}
+  .app-inner{flex-direction:column;gap:32px;}
+  .app-phone{display:none;}
+}
+@media(max-width:480px){
+  .search-grid{grid-template-columns:1fr;}
+  .hero-stats{gap:20px;}
+  .seat-row{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="bus-icon">🚌</span> Shahaji Travels</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="showPage('main');return false;" class="active">Home</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#routes">Routes</a></li>
+    <li><a href="#app">App</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#" onclick="showPage('privacy');return false;">Privacy</a></li>
+    <li><a href="#" onclick="showPage('refund');return false;">Refund</a></li>
+    <li><a href="#" onclick="showPage('terms');return false;">Terms</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MAIN PAGE -->
+<div class="page active" id="main-page">
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Maharashtra's No.1 Bus Booking</div>
+    <h1>Your Journey<br/>Starts with <span>Shahaji</span></h1>
+    <p class="hero-sub">Book bus tickets instantly across Maharashtra. Seater or Sleeper — pick your seat, choose your boarding point, and travel with confidence.</p>
+    <div class="hero-btns">
+      <a href="#app" class="btn-primary">📲 Download App</a>
+      <a href="#routes" class="btn-secondary">View Routes →</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">50+</div><div class="stat-label">Routes</div></div>
+      <div><div class="stat-num">10K+</div><div class="stat-label">Travelers</div></div>
+      <div><div class="stat-num">100%</div><div class="stat-label">Secure</div></div>
+      <div><div class="stat-num">3</div><div class="stat-label">Languages</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-card">
+    <h3>🔍 Search Buses</h3>
+    <div class="search-grid">
+      <div>
+        <div class="field-label">From</div>
+        <div class="input-wrap">
+          <span class="input-icon">📍</span>
+          <input class="search-input" type="text" placeholder="Departure city e.g. Karad" id="fromCity"/>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">To</div>
+        <div class="input-wrap">
+          <span class="input-icon">🏁</span>
+          <input class="search-input" type="text" placeholder="Destination e.g. Mumbai" id="toCity"/>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Date of Journey</div>
+        <div class="input-wrap">
+          <span class="input-icon">📅</span>
+          <input class="search-input" type="date" id="journeyDate"/>
+        </div>
+      </div>
+      <button class="search-btn" onclick="searchBus()">Search Buses 🚌</button>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="sec-label">Why Choose Us</div>
+  <div class="sec-title">Everything You Need to Travel Smart</div>
+  <p class="sec-sub">From seat selection to digital tickets — Shahaji Travels makes every journey seamless and comfortable.</p>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">💺</div><div class="feature-title">Live Seat Selection</div><p class="feature-text">See real-time seat availability. Choose seater or sleeper, pick your preferred position — window or aisle.</p></div>
+    <div class="feature-card"><div class="feature-icon">📱</div><div class="feature-title">UPI &amp; Cash Payment</div><p class="feature-text">Pay via UPI QR code, Razorpay (all cards/wallets), or Cash at boarding. Zero payment hassle.</p></div>
+    <div class="feature-card"><div class="feature-icon">📄</div><div class="feature-title">Instant PDF Ticket</div><p class="feature-text">Get a downloadable PDF ticket with booking ID, seat, boarding point — right after booking. No printout needed.</p></div>
+    <div class="feature-card"><div class="feature-icon">📍</div><div class="feature-title">Multiple Boarding Points</div><p class="feature-text">Choose from multiple boarding and dropping points per route. Pick what's closest to you.</p></div>
+    <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-title">3 Languages</div><p class="feature-text">App available in English, मराठी and हिंदी. Book in your own language, comfortably.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔔</div><div class="feature-title">Real-Time Notifications</div><p class="feature-text">Push notifications for booking confirmation, trip updates, and special offers — never miss an update.</p></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="sec-label">Simple Process</div>
+  <div class="sec-title">How to Book in 4 Steps</div>
+  <p class="sec-sub">Booking your bus ticket takes less than 2 minutes on the Shahaji Travels app.</p>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-num">1</div><div class="step-icon">🔍</div><div class="step-title">Search Buses</div><p class="step-text">Enter your From city, To city and travel date. Tap "Search Buses" to see all available buses.</p></div>
+    <div class="step-card"><div class="step-num">2</div><div class="step-icon">💺</div><div class="step-title">Select Seat</div><p class="step-text">View the live seat map. Tap any available seat — enter passenger name, age, gender and phone.</p></div>
+    <div class="step-card"><div class="step-num">3</div><div class="step-icon">📍</div><div class="step-title">Choose Points</div><p class="step-text">Select your preferred boarding point and dropping point from the available options on the route.</p></div>
+    <div class="step-card"><div class="step-num">4</div><div class="step-icon">🎫</div><div class="step-title">Pay &amp; Get Ticket</div><p class="step-text">Pay via UPI, Card or Cash. Booking confirmed instantly — download your PDF ticket!</p></div>
+  </div>
+</section>
+
+<section id="seats" style="background:#fff;">
+  <div class="sec-label">Seat Layout</div>
+  <div class="sec-title">Live Seat Map — Just Like the App</div>
+  <p class="sec-sub">Our seat map shows real-time availability. Color-coded by gender for easy identification.</p>
+  <div class="seat-demo">
+    <div class="seat-demo-header"><span>DRIVER → </span></div>
+    <p style="font-size:0.8rem;font-weight:700;color:var(--text-sub);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em;">💺 Lower Deck (Seater)</p>
+    <div class="seat-row">
+      <div class="seat-label">R1</div>
+      <div class="seat booked-m"><span class="seat-emoji">💺</span>1</div>
+      <div class="seat-gap"></div>
+      <div class="seat booked-f"><span class="seat-emoji">💺</span>2</div>
+      <div class="seat selected"><span class="seat-emoji">💺</span>3</div>
+      <div class="seat"><span class="seat-emoji">💺</span>4</div>
+    </div>
+    <div class="seat-row">
+      <div class="seat-label">R2</div>
+      <div class="seat"><span class="seat-emoji">💺</span>5</div>
+      <div class="seat-gap"></div>
+      <div class="seat blocked"><span class="seat-emoji">🚫</span>6</div>
+      <div class="seat"><span class="seat-emoji">💺</span>7</div>
+      <div class="seat booked-m"><span class="seat-emoji">💺</span>8</div>
+    </div>
+    <br/>
+    <p style="font-size:0.8rem;font-weight:700;color:var(--text-sub);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em;">🛏️ Upper Deck (Sleeper)</p>
+    <div class="seat-row">
+      <div class="seat-label">U1</div>
+      <div class="seat" style="width:50px;height:58px;"><span class="seat-emoji">🛏️</span>A</div>
+      <div class="seat-gap"></div>
+      <div class="seat booked-f" style="width:50px;height:58px;"><span class="seat-emoji">🛏️</span>B</div>
+      <div class="seat selected" style="width:50px;height:58px;"><span class="seat-emoji">🛏️</span>C</div>
+      <div class="seat" style="width:50px;height:58px;"><span class="seat-emoji">🛏️</span>D</div>
+    </div>
+    <div class="seat-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#fff;border:1.5px solid #ccc;"></div>Available</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Selected</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F39C12;"></div>Booked (Male)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9B59B6;"></div>Booked (Female)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#E0E0E0;border:1.5px solid #9E9E9E;"></div>Blocked</div>
+    </div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="sec-label">Popular Routes</div>
+  <div class="sec-title">Where Do You Want to Go?</div>
+  <p class="sec-sub">Daily bus services across major Maharashtra destinations at affordable fares.</p>
+  <div class="routes-grid">
+    <div class="route-card"><div><div class="route-from">Karad</div><div class="route-arrow">↓</div><div class="route-to">Mumbai</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹350</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Dhabewadi</div><div class="route-arrow">↓</div><div class="route-to">Borivali</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹320</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Satara</div><div class="route-arrow">↓</div><div class="route-to">Pune</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹200</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Islampur</div><div class="route-arrow">↓</div><div class="route-to">Pune</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹250</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Sangli</div><div class="route-arrow">↓</div><div class="route-to">Mumbai</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹450</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Kolhapur</div><div class="route-arrow">↓</div><div class="route-to">Pune</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹380</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Nashik</div><div class="route-arrow">↓</div><div class="route-to">Mumbai</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹300</div><div class="route-per">per seat</div></div></div>
+    <div class="route-card"><div><div class="route-from">Aurangabad</div><div class="route-arrow">↓</div><div class="route-to">Pune</div></div><div class="route-price-wrap"><div class="route-from-label">From</div><div class="route-amount">₹520</div><div class="route-per">per seat</div></div></div>
+  </div>
+</section>
+
+<section id="bustypes">
+  <div class="sec-label">Bus Types</div>
+  <div class="sec-title">AC Seater-Sleeper &amp; AC Sleeper</div>
+  <p class="sec-sub">Choose the bus type that suits your comfort and budget. All buses are GPS tracked and sanitised.</p>
+  <div class="bustypes-grid">
+    <div class="bustype-card">
+      <div class="bustype-head">
+        <div class="bustype-head-icon">🚌</div>
+        <div><div class="bustype-head-title">AC Seater-Sleeper</div><div class="bustype-head-sub">Lower seater + Upper sleeper</div></div>
+      </div>
+      <div class="bustype-body">
+        <div class="bustype-feat"><span class="bustype-feat-icon">💺</span>24 seater seats (Lower deck, numbered 1–24)</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🛏️</span>12 sleeper berths (Upper deck, A–L)</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">❄️</span>Full AC throughout journey</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🎒</span>Luggage compartment below seats</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🔌</span>Mobile charging points</div>
+        <div class="bustype-price"><div class="bustype-price-text">Seater starts from</div><div class="bustype-price-val">₹200 / seat</div></div>
+      </div>
+    </div>
+    <div class="bustype-card">
+      <div class="bustype-head" style="background:#1B5E20;">
+        <div class="bustype-head-icon">🛏️</div>
+        <div><div class="bustype-head-title">AC Sleeper</div><div class="bustype-head-sub">Full sleeper — Left &amp; Right sides</div></div>
+      </div>
+      <div class="bustype-body">
+        <div class="bustype-feat"><span class="bustype-feat-icon">🛏️</span>40 sleeper berths (Lower + Upper, both sides)</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">❄️</span>Premium AC with individual vents</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🪟</span>Reading light + curtain per berth</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🔌</span>USB charging at every berth</div>
+        <div class="bustype-feat"><span class="bustype-feat-icon">🛡️</span>GPS tracked — safety assured</div>
+        <div class="bustype-price" style="background:#E8F5E9;border-color:var(--green-border);"><div class="bustype-price-text">Sleeper starts from</div><div class="bustype-price-val">₹450 / berth</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="payment" style="background:#fff;">
+  <div class="sec-label">Payment Methods</div>
+  <div class="sec-title">Pay Your Way — Safe &amp; Fast</div>
+  <p class="sec-sub">Multiple secure payment options. All transactions are 256-bit SSL encrypted and PCI DSS compliant.</p>
+  <div class="payment-grid">
+
+    <!-- UPI / QR Pay -->
+    <div class="payment-card active">
+      <div class="payment-icon-wrap" style="background:#E8F5E9;">
+        <span style="font-size:1.6rem;">📱</span>
+      </div>
+      <div class="payment-name">UPI / QR Pay</div>
+      <p class="payment-sub">Scan the QR code and pay instantly from GPay, PhonePe, Paytm or any UPI app. Booking confirmed after admin verifies UTR.</p>
+      <div style="margin-top:10px;background:var(--green-light);border:1px solid var(--green-border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;">✅ Zero Extra Charges</div>
+        <div style="font-size:0.82rem;color:var(--green);margin-top:3px;">You pay exactly ₹ ticket amount — nothing more.</div>
+      </div>
+    </div>
+
+    <!-- Razorpay -->
+    <div class="payment-card">
+      <div class="payment-icon-wrap" style="background:#072654;width:60px;height:38px;border-radius:8px;">
+        <span style="color:#3395FF;font-size:0.85rem;font-weight:900;letter-spacing:-0.5px;">Rpay</span>
+      </div>
+      <div class="payment-name" style="margin-top:14px;">Razorpay</div>
+      <p class="payment-sub">Credit card, debit card, net banking, and wallets — all accepted via Razorpay secure gateway.</p>
+      <div style="margin-top:10px;background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:0.72rem;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:0.08em;">⚠️ 2% Payment Gateway Fee</div>
+        <div style="font-size:0.82rem;color:#795548;margin-top:3px;">e.g. ₹500 ticket → You pay ₹510 (₹500 + 2% = ₹10 extra)</div>
+      </div>
+    </div>
+
+    <!-- Cash -->
+    <div class="payment-card">
+      <div class="payment-icon-wrap" style="background:var(--green-light);">
+        <span style="font-size:1.6rem;">💵</span>
+      </div>
+      <div class="payment-name">Cash at Boarding</div>
+      <p class="payment-sub">Pay cash directly to the driver at the boarding point. Available only for approved phone numbers — contact operator to enable.</p>
+      <div style="margin-top:10px;background:#E8F5E9;border:1px solid var(--green-border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;">✅ Zero Extra Charges</div>
+        <div style="font-size:0.82rem;color:var(--green);margin-top:3px;">Pay exact ticket amount. No hidden fees.</div>
+      </div>
+    </div>
+
+  </div>
+  <div style="margin-top:28px;background:var(--chip);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;max-width:600px;">
+    <span style="font-size:1.5rem;">🔒</span>
+    <div>
+      <div style="font-weight:700;font-size:0.9rem;color:var(--text);">100% Secure Transactions</div>
+      <div style="font-size:0.82rem;color:var(--text-sub);margin-top:3px;">256-bit SSL encryption · PCI DSS compliant · Powered by Cashfree Payments</div>
+    </div>
+  </div>
+</section>
+
+<section id="app" style="padding:72px 5%;">
+  <div class="app-inner">
+    <div class="app-content">
+      <div class="sec-label">Mobile App</div>
+      <div class="sec-title">Book Anywhere,<br/>Anytime</div>
+      <p class="sec-sub">Download the Shahaji Travels app for Android. Real-time seat map, instant booking, PDF ticket — everything in your pocket.</p>
+      <div class="app-badges">
+        <a href="#" class="app-badge">
+          <span class="app-badge-icon">🤖</span>
+          <div><div class="app-badge-small">Download on</div><div class="app-badge-big">Google Play</div></div>
+        </a>
+      </div>
+    </div>
+    <div class="app-phone">
+      <div class="app-phone-screen">🚌</div>
+      <div class="app-phone-label">Shahaji Travels<br/>Mobile App</div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="sec-label">Get In Touch</div>
+  <div class="sec-title">Contact &amp; Support</div>
+  <p class="sec-sub">Booking queries, ticket issues or anything else — we're here to help 7 AM to 11 PM daily.</p>
+  <div class="contact-grid">
+    <div class="contact-card"><div class="contact-icon">📞</div><div class="contact-label">Phone / WhatsApp</div><div class="contact-value"><a href="tel:+919021694503">+91 90216 94503</a></div></div>
+    <div class="contact-card"><div class="contact-icon">📧</div><div class="contact-label">Email</div><div class="contact-value"><a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a></div></div>
+    <div class="contact-card"><div class="contact-icon">📍</div><div class="contact-label">Based In</div><div class="contact-value">Pune, Maharashtra, India</div></div>
+    <div class="contact-card"><div class="contact-icon">🕐</div><div class="contact-label">Support Hours</div><div class="contact-value">Mon–Sun, 7 AM – 11 PM</div></div>
+  </div>
+</section>
+
+<div class="dev-section">
+  <div class="dev-title">Developed By</div>
+  <div class="dev-name">Mr. Digambar Barge</div>
+  <div class="dev-contacts">
+    <div class="dev-contact">📞 9021694503</div>
+    <div class="dev-contact">✉️ digubarge123@gmail.com</div>
+    <div class="dev-contact">📍 Pune, Maharashtra</div>
+  </div>
+</div>
+
+</div><!-- end main-page -->
+
+<!-- PRIVACY POLICY -->
+<div class="page" id="privacy-page">
+  <div class="legal-wrap">
+    <h2>Privacy Policy</h2>
+    <p class="legal-updated">Last Updated: May 21, 2026</p>
+    <p>Shahaji Travels ("we", "us", or "our") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website or mobile application.</p>
+    <h3>1. Information We Collect</h3>
+    <ul>
+      <li>Name, phone number, and email address provided during booking or registration</li>
+      <li>Passenger details (name, age, gender) for ticket records</li>
+      <li>Payment information — processed securely via Cashfree Payments (we do not store card/UPI details)</li>
+      <li>Device information, IP address, and app usage data for analytics and notifications (FCM tokens)</li>
+      <li>Location data only if you grant permission, to show nearby boarding points</li>
+    </ul>
+    <h3>2. How We Use Your Information</h3>
+    <ul>
+      <li>To process and confirm your bus ticket bookings</li>
+      <li>To send booking confirmations, OTPs, and PDF tickets via SMS/WhatsApp/app notification</li>
+      <li>To provide customer support and resolve disputes</li>
+      <li>To improve our app and services through analytics</li>
+      <li>To send promotional offers (you may opt out at any time)</li>
+    </ul>
+    <h3>3. Data Sharing</h3>
+    <p>We do not sell or rent your personal data to third parties. We share data only with:</p>
+    <ul>
+      <li>Cashfree Payments — to process transactions securely</li>
+      <li>Razorpay — as an alternate payment gateway</li>
+      <li>Bus operators — to fulfill your booking</li>
+      <li>Firebase (FCM) — to deliver push notifications</li>
+      <li>SMS/WhatsApp providers — to deliver booking updates</li>
+    </ul>
+    <h3>4. Data Security</h3>
+    <p>We implement industry-standard security measures including 256-bit SSL encryption. Payment transactions are processed through PCI DSS compliant gateways. We do not store sensitive payment credentials on our servers.</p>
+    <h3>5. Data Retention</h3>
+    <p>We retain booking data for up to 3 years for legal and accounting purposes. To request deletion of your account and data, contact us at <a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a>.</p>
+    <h3>6. Cookies</h3>
+    <p>Our website uses cookies to enhance your browsing experience. You may disable cookies in your browser settings; however, some features may not function properly.</p>
+    <h3>7. Children's Privacy</h3>
+    <p>Our services are not directed to children under 13 years of age. We do not knowingly collect personal information from minors.</p>
+    <h3>8. Changes to This Policy</h3>
+    <p>We may update this Privacy Policy from time to time. Continued use of our services after changes constitutes acceptance of the updated policy.</p>
+    <h3>9. Contact Us</h3>
+    <p>Email: <a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a><br/>Phone: +91 90216 94503<br/>Address: Pune, Maharashtra, India</p>
+    <a href="#" class="legal-back" onclick="showPage('main');return false;">← Back to Home</a>
+  </div>
+</div>
+
+<!-- REFUND POLICY -->
+<div class="page" id="refund-page">
+  <div class="legal-wrap">
+    <h2>Refund &amp; Cancellation Policy</h2>
+    <p class="legal-updated">Last Updated: May 21, 2026</p>
+    <p>At Shahaji Travels, we believe in a fully customer-friendly refund experience. We offer <strong>100% refunds</strong> on all eligible cancellations.</p>
+    <h3>1. Cancellation by Customer — 100% Refund</h3>
+    <ul>
+      <li><strong>Any time before departure:</strong> 100% full refund of the ticket amount</li>
+      <li><strong>No-show (failure to board):</strong> 100% refund upon request submitted within 24 hours of scheduled departure</li>
+      <li>Refund requests can be made via app ("My Bookings" → Cancel), phone, or email</li>
+    </ul>
+    <h3>2. How to Cancel</h3>
+    <ul>
+      <li>Open the Shahaji Travels app → "My Bookings" → Select booking → "Cancel Ticket"</li>
+      <li>Contact support: <a href="tel:+919021694503">+91 90216 94503</a></li>
+      <li>Email: <a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a></li>
+    </ul>
+    <h3>3. Refund Processing</h3>
+    <ul>
+      <li><strong>100% refund</strong> guaranteed on all eligible cancellations</li>
+      <li>Refunds processed within <strong>3–5 business days</strong></li>
+      <li>Credited back to original payment method (UPI, card, or wallet)</li>
+      <li>Cash payment bookings refunded via UPI or bank transfer</li>
+    </ul>
+    <h3>4. Cancellation by Shahaji Travels</h3>
+    <p>If we cancel a trip due to operational or emergency reasons:</p>
+    <ul>
+      <li>You will be notified immediately via SMS, WhatsApp, and app notification</li>
+      <li><strong>100% full refund</strong> processed within 2–3 business days</li>
+      <li>We will attempt to provide an alternative bus wherever possible</li>
+    </ul>
+    <h3>5. QR/UPI Pending Bookings</h3>
+    <p>For bookings with QR/UPI payment pending admin verification: if verification is rejected, a 100% refund is processed within 3 business days.</p>
+    <h3>6. Disputes</h3>
+    <p>For any refund disputes, contact us within 30 days of the travel date at <a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a>. All disputes resolved within 7 working days.</p>
+    <a href="#" class="legal-back" onclick="showPage('main');return false;">← Back to Home</a>
+  </div>
+</div>
+
+<!-- TERMS & CONDITIONS -->
+<div class="page" id="terms-page">
+  <div class="legal-wrap">
+    <h2>Terms &amp; Conditions</h2>
+    <p class="legal-updated">Last Updated: May 21, 2026</p>
+    <p>By using the Shahaji Travels website or mobile application, you agree to the following Terms and Conditions.</p>
+    <h3>1. Acceptance of Terms</h3>
+    <p>By accessing our platform, you confirm that you are at least 18 years of age (or have parental consent) and agree to these terms.</p>
+    <h3>2. Booking &amp; Ticketing</h3>
+    <ul>
+      <li>All bookings are subject to seat availability at the time of transaction</li>
+      <li>A booking is confirmed only upon successful payment and receipt of a confirmation message/PDF ticket</li>
+      <li>Passengers must carry a valid government-issued ID matching the name on the ticket</li>
+      <li>The digital PDF ticket is a valid travel document — no physical ticket required</li>
+      <li>OTP verification may be required for some bookings to prevent fraud</li>
+    </ul>
+    <h3>3. Payment</h3>
+    <ul>
+      <li>Payments are processed via Cashfree Payments and Razorpay — both PCI DSS compliant</li>
+      <li>We accept UPI, Credit/Debit Cards, Net Banking, and Cash on Boarding</li>
+      <li>All prices are inclusive of applicable taxes unless stated otherwise</li>
+      <li>Razorpay bookings include a 2% payment gateway convenience fee</li>
+      <li>We are not responsible for payment failures caused by your bank or network issues</li>
+    </ul>
+    <h3>4. Travel Rules</h3>
+    <ul>
+      <li>Passengers must arrive at the boarding point at least 15 minutes before departure</li>
+      <li>We are not liable for delays caused by traffic, weather, or force majeure events</li>
+      <li>Maximum one bag per seat — passengers are responsible for their own luggage</li>
+      <li>Smoking, alcohol consumption, and disruptive behavior are strictly prohibited on board</li>
+    </ul>
+    <h3>5. Cancellations &amp; Refunds</h3>
+    <p>Please refer to our <a href="#" onclick="showPage('refund');return false;">Refund &amp; Cancellation Policy</a> — we offer 100% refunds on all eligible cancellations.</p>
+    <h3>6. Limitation of Liability</h3>
+    <p>Shahaji Travels acts as a booking facilitator. Our liability is limited to the ticket value paid. We are not responsible for indirect, incidental, or consequential damages.</p>
+    <h3>7. Intellectual Property</h3>
+    <p>All content — logos, text, app design, code — is the property of Shahaji Travels / Digambar Barge. Unauthorized reproduction is prohibited.</p>
+    <h3>8. Governing Law</h3>
+    <p>These Terms are governed by the laws of India. Disputes are subject to the exclusive jurisdiction of courts in Pune, Maharashtra.</p>
+    <h3>9. Contact</h3>
+    <p><a href="mailto:digubarge123@gmail.com">digubarge123@gmail.com</a> | +91 90216 94503</p>
+    <a href="#" class="legal-back" onclick="showPage('main');return false;">← Back to Home</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🚌 Shahaji Travels</div>
+  <div class="footer-links">
+    <a href="#" onclick="showPage('main');return false;">Home</a>
+    <a href="#" onclick="showPage('privacy');return false;">Privacy Policy</a>
+    <a href="#" onclick="showPage('refund');return false;">Refund Policy</a>
+    <a href="#" onclick="showPage('terms');return false;">Terms &amp; Conditions</a>
+    <a href="#contact" onclick="showPage('main');return false;">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Shahaji Travels · Developed by Mr. Digambar Barge · Pune, Maharashtra, India</div>
+</footer>
+
+<script>
+document.getElementById('journeyDate').valueAsDate = new Date();
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name+'-page').classList.add('active');
+  window.scrollTo(0,0);
+}
+function toggleMenu(){
+  document.getElementById('navLinks').classList.toggle('open');
+}
+function searchBus(){
+  const from=document.getElementById('fromCity').value.trim();
+  const to=document.getElementById('toCity').value.trim();
+  const date=document.getElementById('journeyDate').value;
+  if(!from||!to){alert('Please enter From and To city.');return;}
+  alert('Redirecting to app to search:\n'+from+' → '+to+'\nDate: '+date+'\n\nPlease download the Shahaji Travels app to complete booking.');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('nav')) document.getElementById('navLinks').classList.remove('open');
+});
+</script>
+</body>
+</html>
