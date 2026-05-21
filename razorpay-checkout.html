@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Payment - Shahaji Travels</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:#f5f5f5;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+    .box{background:#fff;padding:32px 24px;border-radius:20px;max-width:380px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.10)}
+    .title{font-size:22px;font-weight:800;color:#C0392B;margin-bottom:4px}
+    .sub{color:#888;font-size:13px;margin-bottom:20px}
+    .amt{font-size:42px;font-weight:800;color:#1C1C1E;margin-bottom:6px}
+    .route{color:#555;font-size:13px;margin-bottom:28px;line-height:1.5}
+    .btn{background:#C0392B;color:#fff;border:none;border-radius:14px;padding:18px;font-size:16px;font-weight:700;width:100%;cursor:pointer}
+    .spinner{width:36px;height:36px;border:4px solid #f0f0f0;border-top:4px solid #C0392B;border-radius:50%;animation:spin .8s linear infinite;margin:20px auto}
+    .msg{font-size:13px;color:#666;margin-top:8px;line-height:1.6}
+    .success{color:#27AE60;font-weight:700;font-size:16px;margin-top:16px;line-height:1.6}
+    .fail{color:#C0392B;font-size:13px;margin-top:12px}
+    .note{font-size:12px;color:#aaa;margin-top:20px;line-height:1.5;padding:10px;background:#f9f9f9;border-radius:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<div class="box">
+  <div class="title">🚌 Shahaji Travels</div>
+  <div class="sub">Secure Payment · Razorpay</div>
+  <div class="amt" id="amtDisplay">₹0</div>
+  <div class="route" id="routeDisplay"></div>
+  <button class="btn" id="payBtn" onclick="startPay()">Pay Now →</button>
+  <div id="status"></div>
+  <div class="note" id="note">Payment complete झाल्यावर automatically app मध्ये redirect होईल</div>
+</div>
+<script>
+var p=new URLSearchParams(window.location.search);
+var KEY=p.get('key')||'';
+var ORDER_ID=p.get('order_id')||'';
+var AMOUNT=parseInt(p.get('amount')||'0');
+var NAME=decodeURIComponent(p.get('name')||'');
+var EMAIL=decodeURIComponent(p.get('email')||'');
+var PHONE=p.get('phone')||'';
+var DESC=decodeURIComponent(p.get('desc')||'');
+var API='https://shahaji-travels-backend.onrender.com';
+document.getElementById('amtDisplay').textContent='₹'+Math.round(AMOUNT/100);
+document.getElementById('routeDisplay').textContent=DESC;
+var paid=false;
+function startPay(){
+  document.getElementById('payBtn').style.display='none';
+  document.getElementById('note').style.display='none';
+  document.getElementById('status').innerHTML='<div class="spinner"></div><div class="msg">Razorpay उघडत आहे...</div>';
+  var opt={
+    key:KEY,amount:AMOUNT,currency:'INR',
+    name:'Shahaji Travels',description:DESC,order_id:ORDER_ID,
+    prefill:{name:NAME,email:EMAIL,contact:PHONE},
+    theme:{color:'#C0392B'},
+    handler:function(r){
+      paid=true;
+      document.getElementById('status').innerHTML='<div class="spinner"></div><div class="msg">Verify करत आहे...</div>';
+      fetch(API+'/api/payment/verify',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({razorpay_payment_id:r.razorpay_payment_id,razorpay_order_id:r.razorpay_order_id,razorpay_signature:r.razorpay_signature})})
+      .then(function(x){return x.json();})
+      .then(function(d){
+        if(d.success){
+          document.getElementById('status').innerHTML='<div class="success">✅ Payment Successful!<br>App मध्ये परत जा.</div>';
+          var dp='razorpay_payment_id='+r.razorpay_payment_id+'&razorpay_order_id='+r.razorpay_order_id+'&razorpay_signature='+encodeURIComponent(r.razorpay_signature)+'&status=success';
+          setTimeout(function(){window.location.href='shahajiravels://payment?'+dp;},1000);
+          setTimeout(function(){window.location.href='shahajitravels://payment?'+dp;},2500);
+        }else{
+          document.getElementById('status').innerHTML='<div class="fail">❌ Verify failed. Support: 9021694503</div>';
+          document.getElementById('payBtn').style.display='block';
+          document.getElementById('payBtn').textContent='Retry →';
+          paid=false;
+        }
+      })
+      .catch(function(){
+        document.getElementById('status').innerHTML='<div class="success">✅ Payment Done!<br>App मध्ये परत जा.</div>';
+        setTimeout(function(){window.location.href='shahajiravels://payment?razorpay_payment_id='+r.razorpay_payment_id+'&status=success';},1500);
+      });
+    },
+    modal:{ondismiss:function(){if(!paid){document.getElementById('status').innerHTML='';document.getElementById('payBtn').style.display='block';document.getElementById('note').style.display='block';}}}
+  };
+  var rzp=new Razorpay(opt);
+  rzp.on('payment.failed',function(r){
+    document.getElementById('status').innerHTML='<div class="fail">❌ Payment Failed!<br>'+r.error.description+'<br>पुन्हा try करा.</div>';
+    document.getElementById('payBtn').style.display='block';
+    document.getElementById('payBtn').textContent='Retry →';
+    paid=false;
+  });
+  rzp.open();
+}
+window.onload=function(){setTimeout(startPay,600);};
+</script>
+</body>
+</html>
