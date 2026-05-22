@@ -56,6 +56,15 @@ function startPay(){
     theme:{color:'#C0392B'},
     handler:function(r){
       paid=true;
+      fetch('https://shahaji-travels-backend.onrender.com/api/payment/save-id',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+    paymentId: r.razorpay_payment_id,
+    orderId:   r.razorpay_order_id,
+    amount:    Math.round(AMOUNT/100),
+  })
+}).catch(function(){});
       document.getElementById('status').innerHTML='<div class="spinner"></div><div class="msg">Verify करत आहे...</div>';
       fetch(API+'/api/payment/verify',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({razorpay_payment_id:r.razorpay_payment_id,razorpay_order_id:r.razorpay_order_id,razorpay_signature:r.razorpay_signature})})
